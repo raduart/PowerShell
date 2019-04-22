@@ -159,6 +159,9 @@ function PayeeNormalize{
     # Table for normalize
     $TNormalize = [ordered]@{ 
                     "LEVANTAMENTO" = "LEV"; 
+                    "COMPRA CENTRO CLINICO" = "CCSAO LUCAS";
+                    "COMPRA LA DOLCE VITA" = "REST LA DOLCE VITA";
+                    "COMPRA ORQUESTRA DE P" = "REST ADAMASTOR";
                     "COMPRA" = "";
                     "PAGAMENTO" = "PAG";
                     "DESPESAS0614002132400" = "PENSAO FILHOS";
