@@ -5,7 +5,7 @@
 
         	  
 	.Description
-	  	This script inputs a csv statement file 
+        This script inputs a csv statement file 
         Selects Rows to be converted
         And Outputs a converted QIF file.
 
@@ -158,19 +158,23 @@ function PayeeNormalize{
     
     # Table for normalize
     $TNormalize = [ordered]@{ 
-                    "LEVANTAMENTO" = "LEV"; 
-                    "COMPRA CENTRO CLINICO" = "CCSAO LUCAS";
-                    "COMPRA LA DOLCE VITA" = "REST LA DOLCE VITA";
-                    "COMPRA ORQUESTRA DE P" = "REST ADAMASTOR";
-                    "COMPRA" = "";
-                    "PAGAMENTO" = "PAG";
-                    "DESPESAS0614002132400" = "PENSAO FILHOS";
-                    "BX VALOR 03 TRANSACCO" = "VIA VERDE";
-                    "QUATTRINO LDA" = "PALHEIRO";
-                    "R C SANCHES -" = "VITAMINAS";
-                    "APOS AUTORIZAC" = "MBNET";
-                    "TRF P2P 966XXX646" = "MBNET TRANSF CLAUDIA";
-                    "TRF P2P" = "MBNET TRANSF";
+                    "LEVANTAMENTO"                               = "LEV"; 
+                    "COMPRA CENTRO CLINICO"                      = "CCSAO LUCAS";
+                    "COMPRA LA DOLCE VITA"                       = "REST LA DOLCE VITA";
+                    "COMPRA 1986 LA DOLCE VITA 1990-203 LISBO"   = "REST LA DOLCE VITA";
+                    "COMPRA ORQUESTRA DE P"                      = "REST ADAMASTOR";
+                    "COMPRA 1986 ORQUESTRA DE PANELASLISBOA"     = "REST ADAMASTOR";
+                    "COMPRA 1986 ORQUESTRA DE PANELASLOTE"       = "REST ADAMASTOR";
+                    "COMPRA RARO   ORIGINA"                      = "REST DEL REI";
+                    "COMPRA 1986 "                               = "";
+                    "COMPRA"                                     = "";
+                    "PAGAMENTO"                                  = "PAG";
+                    "DESPESAS0614002132400"                      = "PENSAO FILHOS";
+                    "BX VALOR 03 TRANSACCO"                      = "VIA VERDE";
+                    "R C SANCHES -"                              = "VITAMINAS";
+                    "APOS AUTORIZAC"                             = "MBNET";
+                    "TRF P2P 966XXX646"                          = "MBNET TRANSF CLAUDIA";
+                    "TRF P2P"                                    = "MBNET TRANSF";
                    }
     $InPayee = $InPayee.ToUpper()    
     foreach ($item in $TNormalize.Keys)
