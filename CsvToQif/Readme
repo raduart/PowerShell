@@ -32,15 +32,24 @@
     .Credits
 
     .Notes / Versions / Output
-	* Version: 1.1
-	  Date: April 29th 2019
-	  Purpose/Change:	Adding total rows selected
+		* Version: 1.2
+		  Date: April 29th 2019
+		  Purpose/Change:	
+            > Selected data has to be contiguous
+            > Display Initial and final balance of selected data
+            > funtion ErrorMsgCentral() is restrutured
+		* Version: 1.1
+		  Date: April 29th 2019
+		  Purpose/Change:	Adding total rows selected
     	* Version: 1.0
-	  Date: April 22th 2019
-	  Purpose/Change:	Initial function development
+		  Date: April 22th 2019
+		  Purpose/Change:	Initial function development
           # Constrains / Pre-requisites:
             > none
           # Output
             > Creates a Transcript File (<ScriptName>_<TrackTimeStamp>.txt)
             > Creates a fileout.qif to be used on MS Money
+    .Link
+        https://github.com/raduart/PowerShell/tree/master/CsvToQif
+
 #########################################################>
