@@ -212,6 +212,7 @@ function PayeeNormalize{
                     "COMPRA 1986 ORQUESTRA DE PANELASLISBOA"     = "REST ADAMASTOR";
                     "COMPRA 1986 ORQUESTRA DE PANELASLOTE"       = "REST ADAMASTOR";
                     "COMPRA RARO   ORIGINA"                      = "REST DEL REI";
+                    "COMPRA MULTIMARCA ASA"                      = "BURGUER KING";		    
                     "COMPRA 1986 "                               = "";
                     "COMPRA"                                     = "";
                     "PAGAMENTO"                                  = "PAG";
