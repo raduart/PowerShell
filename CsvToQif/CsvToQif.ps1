@@ -381,3 +381,4 @@ ErrorMsgCentral -ID 90 `
                                )
                          )
 ErrorMsgCentral -ID 0 -Type "I"
+Stop-Transcript
