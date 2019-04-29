@@ -32,6 +32,9 @@
     .Credits
 
     .Notes / Versions / Output
+		* Version: 1.1
+		  Date: April 29th 2019
+		  Purpose/Change:	Adding total rows selected
     	* Version: 1.0
 		  Date: April 22th 2019
 		  Purpose/Change:	Initial function development
@@ -87,6 +90,7 @@
 		Purpose/Change:	Initial function development
 
     .Link
+        https://github.com/raduart/PowerShell/tree/master/CsvToQif
 
 #########################################################>
 
@@ -268,6 +272,7 @@ if ($SelectedDataCsv.Count -lt 0)
     $SelectedDataCsv = $RawDataFileCsv
     ErrorMsgCentral -ID 20 -Type "I" -MsgData ">>>>> All file content selected !!!"
 }
+$TotalRows = $SelectedDataCsv.Count
 
 if (Test-Path -LiteralPath $FileOut)
    {
@@ -296,5 +301,5 @@ foreach ($Item in $SelectedDataCsv)
     Add-Content $FileOut "^"
 }
 
-ErrorMsgCentral -ID 20 -Type "I" -MsgData "File <$ScriptPath\$FileOut> generated !"
+ErrorMsgCentral -ID 20 -Type "I" -MsgData "File <$ScriptPath\$FileOut> generated ! Total rows: $TotalRows"
 ErrorMsgCentral -ID 0 -Type "E"
