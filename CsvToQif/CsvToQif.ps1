@@ -32,17 +32,26 @@
     .Credits
 
     .Notes / Versions / Output
-		* Version: 1.1
-		  Date: April 29th 2019
-		  Purpose/Change:	Adding total rows selected
+        * Version: 1.2
+          Date: April 29th 2019
+          Purpose/Change:	
+            > Selected data has to be contiguous
+            > Display Initial and final balance of selected data
+            > funtion ErrorMsgCentral() is restrutured
+        * Version: 1.1
+          Date: April 29th 2019
+          Purpose/Change:	Adding total rows selected
     	* Version: 1.0
-		  Date: April 22th 2019
-		  Purpose/Change:	Initial function development
+          Date: April 22th 2019
+          Purpose/Change:	Initial function development
           # Constrains / Pre-requisites:
             > none
           # Output
             > Creates a Transcript File (<ScriptName>_<TrackTimeStamp>.txt)
             > Creates a fileout.qif to be used on MS Money
+    .Link
+        https://github.com/raduart/PowerShell/tree/master/CsvToQif
+
 #########################################################>
 
 
@@ -85,12 +94,13 @@
 		Created By Rafael Duarte
 		Email raduart@microsoft.com		
 
-		Version: 1.0
-		Date: April 22th 2019
-		Purpose/Change:	Initial function development
-
-    .Link
-        https://github.com/raduart/PowerShell/tree/master/CsvToQif
+        Version: 1.1
+        Date: April 29th 2019
+        Purpose/Change:	
+            > funtion ErrorMsgCentral() is restrutured
+        Version: 1.0
+        Date: April 22th 2019
+        Purpose/Change:	Initial function development
 
 #########################################################>
 
@@ -100,19 +110,51 @@ function ErrorMsgCentral{
 	[Parameter(Mandatory=$True)][Alias('Type')][String]$MsgType,
 	[Parameter(Mandatory=$False)][Alias('Data')][String]$MsgData)
 
+    $MsgTxt = "`n<$MsgType$MsgID> - "
     switch ($MsgID) 
     { 
-        0   {$MsgTxt = ""}
-        5   {$MsgTxt = "Syntax: $MsgData" + `
-		     "`n`n .\$($ScriptName).ps1 -H | -I fileIn.csv [-O fileOut.qif]"
+        0   {$MsgTxt += "END SCRIPT`n"}
+        5   {$MsgTxt += (-join (
+                                "Syntax:`n",
+                         "==============`n",
+		                        ".\$($ScriptName).ps1 -H | -I fileIn.csv [-O fileOut.qif]"
+                               )
+                        )
             }
-        10  {$MsgTxt = "Error: Missing data ! $MsgData`n"}
-        20  {$MsgTxt = "Information: $MsgData`n"}
-        default {$MsgTxt = "Error unknown !!!"}
-
+        10  {$MsgTxt += (-join (
+                                "Error:`n",
+                        "==============`n",
+		                        "Missing data !`n",
+                                "$MsgData`n"
+                               )
+                        )
+            }
+        20  {$MsgTxt += (-join (
+                                "Error:`n",
+                        "==============`n",
+		                        "Invalid data !`n",
+                                "$MsgData`n"
+                               )
+                        )
+            }
+        90  {$MsgTxt += (-join (
+                                "Information\Warning:`n",
+                        "============================`n",
+		                        "$MsgData`n"
+                               )
+                        )
+            }
+   default  {$MsgTxt += (-join (
+                                "Error:`n",
+                        "==============`n",
+		                        "Error unknown !!!`n"
+                               )
+                        )
+             $MsgType = "E"
+            }
     }
 
-    Write-Host "`n<$MsgType$MsgID>" -ForegroundColor Yellow 
+    #Write-Host "`n<$MsgType$MsgID>" -ForegroundColor Yellow 
     switch ($MsgType)
     {
         I {Write-Host $MsgTxt -ForegroundColor Green}
@@ -242,8 +284,6 @@ function PayeeNormalize{
     $FileIn = $InFileIn
     $FileOut = $InFileOut
 
-    echo "<$FileIn>"
-
     If ($FileIn -eq "")
     {
         ErrorMsgCentral -ID 10 -Type "E" -MsgData "Missing Input CSV file!"
@@ -264,25 +304,55 @@ function PayeeNormalize{
 $NumDataRows=((get-content $FileIn | select-object -skip 7).count)-3
 $Header = 'Data mov', 'Data valor', 'Descrição', 'Débito', 'Crédito', 'Saldo contabilístico', 'Saldo disponível', 'Categoria' 
 $RawDataFileCsv=(get-content $FileIn | select-object -Skip 7 -first $NumDataRows | ConvertFrom-Csv -Delimiter ";" -Header $Header)
+
+$RowNum = 1
+$RawDataFileCsv = ($RawDataFileCsv |
+                  Select-Object @{ Name = 'RowNum' ; Expression= {(([ref]$RowNum).Value++)} }, 'Data mov', 'Data valor', 'Descrição', 'Débito', 'Crédito', 'Saldo contabilístico', 'Saldo disponível', 'Categoria' )
+
 $SelectedDataCsv = $RawDataFileCsv | Out-GridView -PassThru -Title "Bank statement"
 
-# Cannot select only one row. One Row is equl to select all rows.
+# Cannot select only one row. One Row is equal to select all rows.
 if ($SelectedDataCsv.Count -lt 0)
 {
     $SelectedDataCsv = $RawDataFileCsv
-    ErrorMsgCentral -ID 20 -Type "I" -MsgData ">>>>> All file content selected !!!"
+    ErrorMsgCentral -ID 90 -Type "I" -MsgData ">>>>> All file content selected !!!"
 }
 $TotalRows = $SelectedDataCsv.Count
+$SelectedDataCsv = $SelectedDataCsv | Sort-Object 'RowNum' 
+
+#Checking that selected Data is contiguous
+$ControlRowNum = $SelectedDataCsv[0].RowNum + $SelectedDataCsv.Count - 1 
+$EndRowNum = $SelectedDataCsv[-1].RowNum
+If ($ControlRowNum -ne $EndRowNum)
+{
+    ErrorMsgCentral -ID 20 `
+                    -Type "E" `
+                    -MsgData (-join(
+                                    "Selected data isn't contiguous! `n",
+                                    "$TotalRows rows selected of $($SelectedDataCsv[-1].RowNum - $SelectedDataCsv[0].RowNum + 1) rows expected!`n",
+                                    "From first row #$($SelectedDataCsv[0].RowNum) to last row #$EndRowNum (inclusive)"
+                                  ))
+                    
+    Throw
+}
+
 
 if (Test-Path -LiteralPath $FileOut)
    {
     if (Test-Path -LiteralPath "$FileOut.old") 
     {
         Invoke-Command -ScriptBlock {del "$FileOut.old"}
-        ErrorMsgCentral -ID 20 -Type "W" -MsgData "File <$ScriptPath\$FileOut.old> deleted !"
+        ErrorMsgCentral -ID 90 -Type "W" -MsgData "File <$ScriptPath\$FileOut.old> deleted !"
     }
     Invoke-Command -ScriptBlock {ren $FileOut "$FileOut.old"}
-    ErrorMsgCentral -ID 20 -Type "W" -MsgData "File <$ScriptPath\$FileOut> renamed to <$ScriptPath\$FileOut.old> !"
+    ErrorMsgCentral -ID 90 `
+                    -Type "W" `
+                    -MsgData (-join(
+                                    "File <$ScriptPath\$FileOut> `n",
+                                    "renamed to <$ScriptPath\$FileOut.old> !`n"
+                                   )
+                             )
+
    }
 Add-Content $FileOut "!Type:Bank"
 
@@ -301,5 +371,13 @@ foreach ($Item in $SelectedDataCsv)
     Add-Content $FileOut "^"
 }
 
-ErrorMsgCentral -ID 20 -Type "I" -MsgData "File <$ScriptPath\$FileOut> generated ! Total rows: $TotalRows"
-ErrorMsgCentral -ID 0 -Type "E"
+ErrorMsgCentral -ID 90 `
+                -Type "I" `
+                -MsgData (-join(
+                                "File <$ScriptPath\$FileOut> generated !`n",
+                                "Total rows: $TotalRows`n",
+                                "Initial Balance: $($SelectedDataCsv[-1].'Saldo contabilístico')`n",
+                                "Final   Balance: $($SelectedDataCsv[0].'Saldo contabilístico')"
+                               )
+                         )
+ErrorMsgCentral -ID 0 -Type "I"
